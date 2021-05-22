@@ -1,0 +1,214 @@
+    /* "/sources/counter.sol":91:430  contract Counter {... */
+  mstore(0x40, 0x80)
+    /* "/sources/counter.sol":134:182  constructor() public{... */
+  callvalue
+    /* "--CODEGEN--":8:17   */
+  dup1
+    /* "--CODEGEN--":5:7   */
+  iszero
+  tag_1
+  jumpi
+    /* "--CODEGEN--":30:31   */
+  0x00
+    /* "--CODEGEN--":27:28   */
+  dup1
+    /* "--CODEGEN--":20:32   */
+  revert
+    /* "--CODEGEN--":5:7   */
+tag_1:
+    /* "/sources/counter.sol":134:182  constructor() public{... */
+  pop
+    /* "/sources/counter.sol":174:175  1 */
+  0x01
+    /* "/sources/counter.sol":164:171  counter */
+  0x00
+    /* "/sources/counter.sol":164:175  counter = 1 */
+  dup2
+  swap1
+  sstore
+  pop
+    /* "/sources/counter.sol":91:430  contract Counter {... */
+  dataSize(sub_0)
+  dup1
+  dataOffset(sub_0)
+  0x00
+  codecopy
+  0x00
+  return
+stop
+
+sub_0: assembly {
+        /* "/sources/counter.sol":91:430  contract Counter {... */
+      mstore(0x40, 0x80)
+      callvalue
+        /* "--CODEGEN--":8:17   */
+      dup1
+        /* "--CODEGEN--":5:7   */
+      iszero
+      tag_1
+      jumpi
+        /* "--CODEGEN--":30:31   */
+      0x00
+        /* "--CODEGEN--":27:28   */
+      dup1
+        /* "--CODEGEN--":20:32   */
+      revert
+        /* "--CODEGEN--":5:7   */
+    tag_1:
+        /* "/sources/counter.sol":91:430  contract Counter {... */
+      pop
+      jumpi(tag_2, lt(calldatasize, 0x04))
+      shr(0xe0, calldataload(0x00))
+      dup1
+      0x1003e2d2
+      eq
+      tag_3
+      jumpi
+      dup1
+      0x8ada066e
+      eq
+      tag_4
+      jumpi
+      dup1
+      0xd09de08a
+      eq
+      tag_5
+      jumpi
+    tag_2:
+      0x00
+      dup1
+      revert
+        /* "/sources/counter.sol":253:310  function add(uint v) public {... */
+    tag_3:
+      tag_6
+      0x04
+      dup1
+      calldatasize
+      sub
+        /* "--CODEGEN--":13:15   */
+      0x20
+        /* "--CODEGEN--":8:11   */
+      dup2
+        /* "--CODEGEN--":5:16   */
+      lt
+        /* "--CODEGEN--":2:4   */
+      iszero
+      tag_7
+      jumpi
+        /* "--CODEGEN--":29:30   */
+      0x00
+        /* "--CODEGEN--":26:27   */
+      dup1
+        /* "--CODEGEN--":19:31   */
+      revert
+        /* "--CODEGEN--":2:4   */
+    tag_7:
+        /* "/sources/counter.sol":253:310  function add(uint v) public {... */
+      dup2
+      add
+      swap1
+      dup1
+      dup1
+      calldataload
+      swap1
+      0x20
+      add
+      swap1
+      swap3
+      swap2
+      swap1
+      pop
+      pop
+      pop
+      tag_8
+      jump	// in
+    tag_6:
+      stop
+        /* "/sources/counter.sol":317:428  function getCounter() ... */
+    tag_4:
+      tag_9
+      tag_10
+      jump	// in
+    tag_9:
+      mload(0x40)
+      dup1
+      dup3
+      dup2
+      mstore
+      0x20
+      add
+      swap2
+      pop
+      pop
+      mload(0x40)
+      dup1
+      swap2
+      sub
+      swap1
+      return
+        /* "/sources/counter.sol":192:246  function increment() public {... */
+    tag_5:
+      tag_11
+      tag_12
+      jump	// in
+    tag_11:
+      stop
+        /* "/sources/counter.sol":253:310  function add(uint v) public {... */
+    tag_8:
+        /* "/sources/counter.sol":302:303  v */
+      dup1
+        /* "/sources/counter.sol":291:298  counter */
+      0x00
+      dup1
+        /* "/sources/counter.sol":291:303  counter += v */
+      dup3
+      dup3
+      sload
+      add
+      swap3
+      pop
+      pop
+      dup2
+      swap1
+      sstore
+      pop
+        /* "/sources/counter.sol":253:310  function add(uint v) public {... */
+      pop
+      jump	// out
+        /* "/sources/counter.sol":317:428  function getCounter() ... */
+    tag_10:
+        /* "/sources/counter.sol":386:390  uint */
+      0x00
+        /* "/sources/counter.sol":414:421  counter */
+      dup1
+      sload
+        /* "/sources/counter.sol":407:421  return counter */
+      swap1
+      pop
+        /* "/sources/counter.sol":317:428  function getCounter() ... */
+      swap1
+      jump	// out
+        /* "/sources/counter.sol":192:246  function increment() public {... */
+    tag_12:
+        /* "/sources/counter.sol":230:237  counter */
+      0x00
+      dup1
+        /* "/sources/counter.sol":230:239  counter++ */
+      dup2
+      sload
+      dup1
+      swap3
+      swap2
+      swap1
+      0x01
+      add
+      swap2
+      swap1
+      pop
+      sstore
+      pop
+        /* "/sources/counter.sol":192:246  function increment() public {... */
+      jump	// out
+
+    auxdata: 0xa265627a7a72305820b41f3b9bccbd8155da53e6aae372b1ac0c53a6e12d1300a0b99e65089addb8ba64736f6c634300050a0032
+}

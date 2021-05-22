@@ -8,12 +8,16 @@ import { Evmc, EvmcCallKind, EvmcMessage, EvmcStatusCode, EvmcStorageStatus } fr
 const app = express();
 
 class MyEVM extends Evmc {
+
     async getAccountExists(account: bigint) {
+        this.increment("getAccountExists");
+        console.log(account); 
         // Accounts always exist
         return true;
     }
 
     async getStorage(account: bigint, key: bigint) {
+        this.increment("getStorage");
         // Our "test" storage always returns the magic number
         if (key === param.STORAGE_ADDRESS) {
             return param.STORAGE_VALUE;
@@ -22,6 +26,7 @@ class MyEVM extends Evmc {
     }
 
     async setStorage(account: bigint, key: bigint, val: bigint) {
+        this.increment("setStorage");
         if (key === param.STORAGE_ADDRESS && val === param.STORAGE_VALUE) {
             return EvmcStorageStatus.EVMC_STORAGE_ADDED;
         }
@@ -29,15 +34,18 @@ class MyEVM extends Evmc {
     }
 
     async getBalance(account: bigint) {
-        console.log("getBalance account: ", account);
+        this.increment("getBalance");
+        
         if (account === param.BALANCE_ACCOUNT) {
             return param.BALANCE_BALANCE;
+        } else if (account === 0n) {
+            return 0n;
         }
-        return param.BALANCE_BALANCE;
         throw new Error(`Invalid balance account (got ${account.toString(16)})`);
     }
 
     async getCodeSize(account: bigint) {
+        this.increment("getCodeSize");
         if (account === param.BALANCE_ACCOUNT) {
             return param.BALANCE_CODESIZE;
         }
@@ -45,6 +53,8 @@ class MyEVM extends Evmc {
     }
 
     async getCodeHash(account: bigint) {
+        this.increment("getCodeHash");
+
         if (account === param.BALANCE_ACCOUNT) {
             return param.BALANCE_CODEHASH;
         }
@@ -52,6 +62,8 @@ class MyEVM extends Evmc {
     }
 
     async copyCode(account: bigint, offset: number, length: number) {
+        this.increment("copyCode");
+
         if (account === param.CODE_ACCOUNT && offset === 0 &&
             length === param.CODE_CODE.length) {
             return param.CODE_CODE;
@@ -60,6 +72,8 @@ class MyEVM extends Evmc {
     }
 
     async selfDestruct(account: bigint, beneficiary: bigint) {
+        this.increment("selfDestruct");
+
         if (account === param.TX_ORIGIN && beneficiary === param.SELF_DESTRUCT_BENEFICIARY) {
             return;
         }
@@ -68,18 +82,25 @@ class MyEVM extends Evmc {
     }
 
     async call(message: EvmcMessage) {
+        this.increment("call");
+
+        console.log("-- inputdata: ", message.inputData);
+        console.log("-- paramdata: ", param.CODE_INPUT_DATA);
         if (message.inputData.equals(param.CODE_INPUT_DATA)) {
             return {
                 statusCode: EvmcStatusCode.EVMC_SUCCESS,
                 gasLeft: 10000n,
                 outputData: param.CODE_OUTPUT_DATA,
                 createAddress: param.CREATE_OUTPUT_ACCOUNT
-            };
+            }; 
         }
         throw new Error(`Unexpected input message ${util.inspect(message)}`);
     }
 
     async getTxContext() {
+        this.increment("getTxContext");
+
+
         return {
             txGasPrice: param.TX_GASPRICE,
             txOrigin: param.TX_ORIGIN,
@@ -92,6 +113,8 @@ class MyEVM extends Evmc {
     }
 
     async getBlockHash(num: bigint) {
+        this.increment("getBlockHash");
+
         if (num === param.BLOCKHASH_NUM) {
             return param.BLOCKHASH_HASH;
         }
@@ -100,12 +123,30 @@ class MyEVM extends Evmc {
     }
 
     async emitLog(account: bigint, data: Buffer, topics: Array<bigint>) {
+        this.increment("emitLog");
+
+
         if (account === param.BALANCE_ACCOUNT && data.equals(param.LOG_DATA) &&
             topics.length === 2 && topics[0] === param.LOG_TOPIC1 &&
             topics[1] === param.LOG_TOPIC2) {
             return;
         }
         throw new Error(`Unexpected log emitted: account: ${account.toString(16)} data: ${data.toString('hex')} topics: ${topics}`);
+    }
+
+    counter = 0;
+
+    MyEvmc() {
+        this.counter = 0;
+    }
+
+    increment(location: string) {
+        console.log("\n--- ", this.counter, " ", location);
+        this.counter+=1;
+    }
+
+    getCounter() {
+        return this.counter;
     }
 }
 
@@ -115,52 +156,21 @@ const getDynamicLibraryExtension = () => {
         process.platform === 'darwin' ? 'dylib' : 'so';
 };
 
-var Contract = require('web3-eth-contract');
-var contract = new Contract(param.example_abi);
 const evmpath = path.join(__dirname, `../interpreter/libaleth-interpreter.${getDynamicLibraryExtension()}`);
-console.log("=== EVM path: ", evmpath);
-const encoded = contract.methods.getCounter().encodeABI();
-console.log("encoded", encoded);
 
-const evmasm = require('evmasm');
-
-function hexStringToByte(str: string) {
-    if (!str) {
-        return new Uint8Array();
-    }
-
-    var a = [];
-    for (var i = 0, len = str.length; i < len; i += 2) {
-        a.push(parseInt(str.substr(i, 2), 16));
-    }
-
-    return new Uint8Array(a);
-}
-
-const message = {
-    kind: EvmcCallKind.EVMC_CALL,
-    sender: param.BALANCE_ACCOUNT,
-    depth: 0,
-    destination: param.TX_DESTINATION,
-    gas: param.TX_GAS,
-    inputData: Buffer.from(hexStringToByte(encoded)),
-    value: 0n
-};
-
-console.log("before creating evm");
 const evm = new MyEVM(evmpath);
-console.log("before execute");
 
 const test = async () => {
-    const code = Buffer.from(param.example_bytecode, 'utf8');
-    console.log("code", code);
-    const result = await evm.execute(message, code);
-    console.log("result");
-    console.log(result);
-}
+    const result = await evm.execute(param.EVM_MESSAGE, param.code);
+    
+    console.log("result:");
+    console.log("=========");
+    console.log("status code: ", result.statusCode);
+    console.log("gasLeft: ", result.gasLeft);
+    console.log("message: ", result.outputData.toString());
+} 
 
 const result = test();
-console.log("started testing");
 
 app.get('/', async (req, res) => {
     // await test();
