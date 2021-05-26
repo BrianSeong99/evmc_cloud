@@ -4,7 +4,7 @@
   "description": "This is the microservice application running on cloud with EVMC supports",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -r ts-node/register ./src/test.*.ts --timeout 40000",
     "dev": "npx tsc -w & nodemon dist/index.js"
   },
   "repository": {
@@ -28,8 +28,14 @@
     "typescript": "^4.2.4"
   },
   "dependencies": {
+    "@types/benchmark": "^1.0.31",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.9.6",
+    "chai": "^4.2.0",
     "evmc": "^1.0.8",
     "express": "^4.17.1",
+    "mocha": "^6.0.2",
     "web3": "^1.3.5"
   }
 }
